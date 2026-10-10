@@ -2,15 +2,9 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0F172A">
     <title>Kasir Sate Taichan ANIN - Elegant Edition</title>
-    
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://placehold.co">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
@@ -25,59 +19,83 @@
             --cream: #F8F5EF;
             --slate: #64748B;
         }
-        * { -webkit-tap-highlight-color: transparent; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
         
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
         .bg-navy { background-color: var(--navy); }
         .bg-navy-light { background-color: var(--navy-light); }
         .bg-gold { background-color: var(--gold); }
         .bg-cream { background-color: var(--cream); }
         .text-gold { color: var(--gold); }
         .text-navy { color: var(--navy); }
-        .border-gold { border-color: var(--gold); }
         
-        .font-elegant { font-family: 'Playfair Display', serif; letter-spacing: 0.5px; }
+        .font-elegant { font-family: 'Playfair Display', serif; }
         .font-modern { font-family: 'Inter', sans-serif; }
 
         .main-background {
             background: linear-gradient(135deg, #F8F5EF 0%, #EDE8DD 100%);
-            position: relative;
-            overflow: hidden;
-            contain: layout style paint;
         }
-        .main-background::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(201, 162, 39, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(15, 23, 42, 0.05) 0%, transparent 50%);
-            z-index: 0;
-            pointer-events: none;
-        }
-        .main-background > * { position: relative; z-index: 1; }
 
-        /* ==================== SIDEBAR COLLAPSIBLE ==================== */
-        .sidebar-db {
+        /* ==================== SIDEBAR - FIXED MOBILE ==================== */
+        #sidebar {
             background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
             border-right: 1px solid rgba(201, 162, 39, 0.3);
             box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-                        transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: width, transform;
-            overflow: hidden;
+            transition: transform 0.35s ease, width 0.35s ease;
+            z-index: 60;
+            width: 256px;
+            flex-shrink: 0;
         }
-        
-        .sidebar-db.collapsed { width: 72px; }
-        
-        .sidebar-db.collapsed .sidebar-text,
-        .sidebar-db.collapsed .sidebar-logo-text,
-        .sidebar-db.collapsed .sidebar-quote,
-        .sidebar-db.collapsed .sidebar-footer-text {
-            opacity: 0;
-            width: 0;
-            pointer-events: none;
+
+        /* Desktop: sidebar normal */
+        @media (min-width: 1024px) {
+            #sidebar {
+                position: relative;
+                transform: none !important;
+            }
+            #sidebar.collapsed {
+                width: 72px;
+            }
+            #sidebar.collapsed .sidebar-text,
+            #sidebar.collapsed .sidebar-logo-text,
+            #sidebar.collapsed .sidebar-quote,
+            #sidebar.collapsed .sidebar-footer-text {
+                opacity: 0;
+                width: 0;
+                pointer-events: none;
+            }
+            #sidebar.collapsed .logo-wrapper {
+                width: 44px !important;
+                height: 44px !important;
+            }
+            #sidebar.collapsed .nav-link {
+                justify-content: center;
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
         }
-        
+
+        /* Mobile: sidebar tersembunyi dari kiri, default TERTUTUP */
+        @media (max-width: 1023px) {
+            #sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+                z-index: 100;
+            }
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+        }
+
         .sidebar-text,
         .sidebar-logo-text,
         .sidebar-quote,
@@ -86,22 +104,22 @@
             white-space: nowrap;
             overflow: hidden;
         }
-        
-        .sidebar-db.collapsed .logo-wrapper {
-            width: 44px !important;
-            height: 44px !important;
-        }
-        
-        .sidebar-db.collapsed .nav-link {
-            justify-content: center;
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
-        }
-        .sidebar-db.collapsed .nav-link .nav-icon { font-size: 1.25rem; }
-        .sidebar-db.collapsed .nav-link::before { display: none; }
 
-        .sidebar-toggle {
+        /* ==================== OVERLAY MOBILE ==================== */
+        #sidebar-overlay {
             display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            z-index: 50;
+        }
+        #sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ==================== TOGGLE BUTTON ==================== */
+        #btn-toggle-sidebar {
+            display: flex;
             align-items: center;
             justify-content: center;
             width: 40px;
@@ -111,61 +129,22 @@
             color: var(--gold);
             cursor: pointer;
             border: 1px solid rgba(201, 162, 39, 0.3);
-            transition: all 0.2s;
             font-size: 1.1rem;
             flex-shrink: 0;
+            transition: all 0.2s;
         }
-        .sidebar-toggle:hover {
+        #btn-toggle-sidebar:hover {
             background: rgba(201, 162, 39, 0.3);
-            transform: scale(1.05);
-        }
-        .sidebar-toggle:active { transform: scale(0.95); }
-
-        @media (min-width: 768px) {
-            .sidebar-toggle { display: flex; }
         }
 
-        /* ==================== RESPONSIVE MOBILE ==================== */
-        @media (max-width: 767px) {
-            .sidebar-db {
-                position: fixed;
-                left: 0;
-                top: 0;
-                height: 100vh;
-                z-index: 100;
-                transform: translateX(-100%);
-                width: 256px !important;
-            }
-            .sidebar-db.mobile-open { transform: translateX(0); }
-            .sidebar-toggle { display: flex; }
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(15, 23, 42, 0.6);
-                backdrop-filter: blur(2px);
-                z-index: 99;
-                animation: fadeIn 0.2s ease-out;
-            }
-            .sidebar-overlay.active { display: block; }
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-        }
-
-        .logo-float { animation: float 4s ease-in-out infinite; will-change: transform; }
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
-
+        /* ==================== CARD ==================== */
         .card-db {
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(201, 162, 39, 0.3);
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+            position: relative;
             overflow: hidden;
-            contain: layout style;
         }
         .card-db::before {
             content: '';
@@ -175,163 +154,101 @@
             background: linear-gradient(90deg, transparent, var(--gold), transparent);
             opacity: 0.6;
         }
-        .card-db:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(201, 162, 39, 0.2);
-            border-color: var(--gold);
-        }
 
+        /* ==================== BUTTONS ==================== */
         .btn-db {
             transition: transform 0.2s, box-shadow 0.2s;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
-            position: relative;
-            overflow: hidden;
             border: none;
             cursor: pointer;
         }
-        .btn-db::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        .btn-db:hover::before { left: 100%; }
-        .btn-db:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2); }
-        .btn-db:active { transform: translateY(0); }
+        .btn-db:active { transform: scale(0.97); }
 
-        .page-content { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+        .nav-link {
+            transition: background-color 0.2s, color 0.2s;
+            border-radius: 8px;
         }
-
-        .nav-link { transition: background-color 0.2s, color 0.2s; position: relative; border-radius: 8px; }
-        .nav-link:hover { background-color: rgba(201, 162, 39, 0.1); color: var(--gold-light); }
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 50%;
-            transform: translateY(-50%);
-            width: 3px; height: 0;
-            background: var(--gold);
-            transition: height 0.2s;
-            border-radius: 2px;
-        }
-        .nav-link:hover::before { height: 60%; }
-
-        .menu-item { 
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s, border-color 0.25s;
-            border-radius: 10px;
-            will-change: transform;
-            contain: layout style paint;
-        }
-        .menu-item:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12); border-color: var(--gold); }
-        .menu-item:active { transform: translateY(-2px) scale(0.98); }
-
-        .cart-item { animation: cartSlide 0.25s ease-out; }
-        @keyframes cartSlide {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .total-price { animation: totalPulse 2s ease-in-out infinite; }
-        @keyframes totalPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
-        .modal.active { display: flex; animation: modalFade 0.25s ease-out; }
-        @keyframes modalFade {
-            from { opacity: 0; transform: scale(0.97); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .shake-animation { animation: shake 0.5s ease-in-out; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-            20%, 40%, 60%, 80% { transform: translateX(4px); }
+        .nav-link:hover {
+            background-color: rgba(201, 162, 39, 0.1);
+            color: var(--gold-light);
         }
 
         .btn-bayar {
             background: linear-gradient(135deg, #C9A227 0%, #E5C158 50%, #C9A227 100%);
-            background-size: 200% 200%;
-            animation: gradientShift 3s ease infinite;
-        }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
 
+        /* ==================== HIDE SCROLLBAR ==================== */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ==================== MODAL ==================== */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal.active { display: flex; }
+
+        /* ==================== STRUK ==================== */
         .struk-container {
             background: #FFFFFF;
             width: 380px;
             max-width: 95vw;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 28px;
+            padding: 25px;
             border-radius: 16px;
             box-shadow: 0 25px 60px rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(201, 162, 39, 0.3);
-            font-family: 'Inter', sans-serif;
             color: var(--navy);
-            animation: strukSlideIn 0.3s ease-out;
-            position: relative;
         }
-        .struk-container::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            border-radius: 16px 16px 0 0;
-        }
-        @keyframes strukSlideIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .struk-header { text-align: center; margin-bottom: 14px; }
-        .struk-logo { display: flex; justify-content: center; margin-bottom: 12px; }
-        .struk-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--navy); letter-spacing: 2px; margin: 0; font-weight: 700; }
-        .struk-subtitle { font-size: 11px; color: var(--slate); font-style: italic; margin: 4px 0; }
-        .struk-address, .struk-phone { font-size: 10px; color: var(--slate); margin: 2px 0; }
-        .struk-divider { border-top: 1px dashed rgba(201, 162, 39, 0.5); margin: 14px 0; }
+        .struk-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); font-weight: 700; text-align: center; margin: 0; }
+        .struk-subtitle { font-size: 10px; color: var(--slate); font-style: italic; text-align: center; margin: 3px 0; }
+        .struk-address, .struk-phone { font-size: 10px; color: var(--slate); text-align: center; margin: 1px 0; }
+        .struk-divider { border-top: 1px dashed rgba(201, 162, 39, 0.5); margin: 12px 0; }
         .struk-info { font-size: 12px; }
-        .struk-info-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .struk-info-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
         .struk-info-row span:first-child { color: var(--slate); }
-        .struk-info-row span:last-child { font-weight: 600; color: var(--navy); }
+        .struk-info-row span:last-child { font-weight: 600; }
         .struk-items { font-size: 12px; }
-        .struk-item { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dotted rgba(100, 116, 139, 0.3); }
-        .struk-item-name { font-weight: 600; color: var(--navy); display: block; margin-bottom: 3px; }
+        .struk-item { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px dotted rgba(100, 116, 139, 0.3); }
+        .struk-item-name { font-weight: 600; display: block; margin-bottom: 2px; }
         .struk-item-detail { display: flex; justify-content: space-between; font-size: 11px; color: var(--slate); }
         .struk-item-qty { color: var(--gold); font-weight: 600; }
-        .struk-total { font-size: 13px; }
-        .struk-total-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-        .struk-grand-total { font-size: 20px; font-weight: 700; color: var(--navy); border-top: 2px solid var(--navy); border-bottom: 2px solid var(--navy); padding: 10px 0; margin-top: 10px; font-family: 'Playfair Display', serif; }
-        .struk-footer { text-align: center; font-size: 11px; margin-top: 12px; }
-        .struk-thanks { font-weight: 700; font-size: 13px; color: var(--gold); margin: 10px 0; letter-spacing: 3px; font-family: 'Playfair Display', serif; }
-        .struk-message { color: var(--slate); margin: 2px 0; }
-        .struk-barcode { margin-top: 16px; text-align: center; }
-        .barcode-lines { height: 40px; background: repeating-linear-gradient(90deg, var(--navy) 0px, var(--navy) 2px, transparent 2px, transparent 4px, var(--navy) 4px, var(--navy) 5px, transparent 5px, transparent 8px, var(--navy) 8px, var(--navy) 12px, transparent 12px, transparent 14px); margin-bottom: 5px; }
-        .struk-barcode-text { font-size: 10px; letter-spacing: 3px; color: var(--slate); }
-        .struk-actions { display: flex; gap: 10px; margin-top: 22px; padding-top: 18px; border-top: 1px dashed rgba(201, 162, 39, 0.5); }
-        .btn-struk { flex: 1; padding: 12px; border-radius: 8px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; border: none; text-transform: uppercase; }
+        .struk-total-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; }
+        .struk-grand-total { font-size: 18px; font-weight: 700; border-top: 2px solid var(--navy); border-bottom: 2px solid var(--navy); padding: 8px 0; margin-top: 8px; font-family: 'Playfair Display', serif; }
+        .struk-thanks { font-weight: 700; font-size: 12px; color: var(--gold); margin: 8px 0; letter-spacing: 2px; text-align: center; font-family: 'Playfair Display', serif; }
+        .struk-message { color: var(--slate); margin: 2px 0; text-align: center; font-size: 11px; }
+        .struk-barcode { margin-top: 14px; text-align: center; }
+        .barcode-lines { height: 36px; background: repeating-linear-gradient(90deg, var(--navy) 0px, var(--navy) 2px, transparent 2px, transparent 4px, var(--navy) 4px, var(--navy) 5px, transparent 5px, transparent 8px, var(--navy) 8px, var(--navy) 12px, transparent 12px, transparent 14px); margin-bottom: 4px; }
+        .struk-barcode-text { font-size: 10px; letter-spacing: 2px; color: var(--slate); }
+        .struk-actions { display: flex; gap: 8px; margin-top: 18px; padding-top: 14px; border-top: 1px dashed rgba(201, 162, 39, 0.5); }
+        .btn-struk { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; border: none; text-transform: uppercase; }
         .btn-cetak { background: var(--navy); color: white; }
-        .btn-cetak:hover { background: var(--navy-light); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3); }
         .btn-tutup { background: var(--gold); color: white; }
-        .btn-tutup:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(201, 162, 39, 0.3); }
 
-        .img-fade { opacity: 0; transition: opacity 0.3s; }
-        .img-fade.loaded { opacity: 1; }
+        /* ==================== RESPONSIVE MOBILE ==================== */
+        @media (max-width: 640px) {
+            .card-db { padding: 0.6rem !important; }
+            header { padding: 0.5rem 0.75rem !important; }
+            #page-title { font-size: 1.1rem !important; }
+            #page-subtitle { font-size: 0.7rem !important; }
+            .dash-num { font-size: 1.05rem !important; }
+            .dash-label { font-size: 0.65rem !important; }
+            .menu-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            .struk-container { padding: 16px !important; }
+            .btn-struk { min-height: 40px; font-size: 11px; }
+        }
+
+        @media (min-width: 641px) and (max-width: 1023px) {
+            .menu-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
 
         @media print {
             body * { visibility: hidden; }
@@ -341,165 +258,137 @@
             .struk-container { box-shadow: none; border: none; max-height: none; }
         }
 
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
+        /* Floating Action Button untuk toggle di mobile */
+        .fab-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: var(--navy);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            z-index: 90;
+            cursor: pointer;
+            border: none;
         }
-
-        /* ==================== RESPONSIVE EXTRA ==================== */
-        @media (max-width: 767px) {
-            .card-db { padding: 0.75rem !important; }
-            .menu-item { padding: 0.5rem !important; }
-            #dash-total-penjualan,
-            #dash-jumlah-transaksi,
-            #dash-stok-menipis { font-size: 1.1rem !important; }
-            #dash-menu-terlaris { font-size: 0.9rem !important; }
-            header { padding: 0.75rem 0.5rem !important; }
-            .h-64 { height: 14rem !important; }
-            .modal > div { width: 95vw !important; max-width: 95vw !important; }
-            .struk-container { padding: 18px !important; font-size: 11px !important; }
-            button { min-height: 38px; }
-            .btn-struk { min-height: 44px; }
-        }
-
-        @media (min-width: 768px) and (max-width: 1023px) {
-            .grid-cols-4 {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        html { scroll-behavior: smooth; }
-
-        .sidebar-text,
-        .font-elegant {
-            overflow-wrap: break-word;
-            word-wrap: break-word;
+        @media (max-width: 1023px) {
+            .fab-toggle { display: flex; }
         }
     </style>
 </head>
-<body class="font-modern antialiased flex h-screen overflow-hidden text-base">
+<body class="font-modern antialiased flex h-screen overflow-hidden">
 
-    <!-- OVERLAY (untuk mobile) -->
-    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <!-- OVERLAY -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="w-64 sidebar-db text-white flex flex-col shrink-0 shadow-2xl z-20">
-        <div class="p-6 flex flex-col items-center border-b border-gold/30 relative">
-            <div class="logo-wrapper w-24 h-24 rounded-full bg-gradient-to-br from-[#C9A227] to-[#8B7418] border-2 border-gold flex items-center justify-center overflow-hidden shadow-lg logo-float transition-all duration-300">
-                <img src="images/logo.png" alt="Logo" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/100x100/C9A227/FFFFFF?text=ANIN'">
+    <aside id="sidebar" class="text-white flex flex-col">
+        <div class="p-5 flex flex-col items-center border-b border-gold/30">
+            <div class="logo-wrapper w-20 h-20 rounded-full bg-gradient-to-br from-[#C9A227] to-[#8B7418] border-2 border-gold flex items-center justify-center overflow-hidden shadow-lg transition-all duration-300">
+                <img src="images/logo.png" alt="Logo" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/100x100/C9A227/FFFFFF?text=ANIN'">
             </div>
-            <h1 class="sidebar-logo-text font-elegant text-gold mt-3 text-center" style="font-size: 17px; font-weight: 700;">TAICHAN ANIN</h1>
-            <p class="sidebar-quote text-xs text-center mt-1 italic text-gray-400 font-modern">"Nikmat Luar Biasa!"</p>
+            <h1 class="sidebar-logo-text font-elegant text-gold mt-3 text-center" style="font-size: 16px; font-weight: 700;">TAICHAN ANIN</h1>
+            <p class="sidebar-quote text-xs text-center mt-1 italic text-gray-400">"Sate Taichan Rasa Sederhana!"</p>
         </div>
         
-        <nav class="flex-1 px-3 py-6 space-y-2 overflow-y-auto hide-scrollbar">
-            <a href="#" onclick="showPage('dashboard');return false;" id="nav-dashboard" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 font-modern text-sm rounded-lg">
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto hide-scrollbar">
+            <a href="#" onclick="showPage('dashboard');return false;" id="nav-dashboard" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 text-sm">
                 <span class="nav-icon text-lg shrink-0">◆</span>
                 <span class="sidebar-text">Dashboard</span>
             </a>
-            <a href="#" onclick="showPage('pos');return false;" id="nav-pos" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 font-modern text-sm rounded-lg">
+            <a href="#" onclick="showPage('pos');return false;" id="nav-pos" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 text-sm">
                 <span class="nav-icon text-lg shrink-0">◆</span>
                 <span class="sidebar-text">Penjualan / POS</span>
             </a>
-            <a href="#" onclick="showPage('menu');return false;" id="nav-menu" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 font-modern text-sm rounded-lg">
+            <a href="#" onclick="showPage('menu');return false;" id="nav-menu" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 text-sm">
                 <span class="nav-icon text-lg shrink-0">◆</span>
                 <span class="sidebar-text">Menu</span>
             </a>
-            <a href="#" onclick="showPage('stok');return false;" id="nav-stok" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 font-modern text-sm rounded-lg">
+            <a href="#" onclick="showPage('stok');return false;" id="nav-stok" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 text-sm">
                 <span class="nav-icon text-lg shrink-0">◆</span>
                 <span class="sidebar-text">Stok Bahan</span>
             </a>
-            <a href="#" onclick="showPage('laporan');return false;" id="nav-laporan" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 font-modern text-sm rounded-lg">
+            <a href="#" onclick="showPage('laporan');return false;" id="nav-laporan" class="nav-link flex items-center gap-3 px-4 py-3 cursor-pointer text-gray-300 text-sm">
                 <span class="nav-icon text-lg shrink-0">◆</span>
                 <span class="sidebar-text">Laporan</span>
             </a>
         </nav>
         
-        <div class="p-4 text-center text-xs text-gray-500 border-t border-gold/20 font-modern italic sidebar-footer-text">
+        <div class="p-3 text-center text-xs text-gray-500 border-t border-gold/20 italic sidebar-footer-text">
             © 2026 Taichan Anin
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col overflow-y-auto main-background">
-        <header class="bg-white/80 backdrop-blur-md px-4 md:px-8 py-4 flex justify-between items-center shadow-sm sticky top-0 z-10 border-b border-gold/20">
-            <div class="flex items-center gap-3">
-                <!-- Tombol Toggle Sidebar -->
-                <button onclick="toggleSidebar()" class="sidebar-toggle" title="Buka/Tutup Menu">
-                    <span id="toggle-icon">☰</span>
-                </button>
-                
-                <div>
-                    <h2 class="text-xl md:text-2xl lg:text-3xl font-elegant text-navy" id="page-title">Dashboard</h2>
-                    <p class="text-xs md:text-sm font-modern text-slate-500 font-medium" id="page-subtitle">Selamat datang di Sistem Kasir Sate Taichan ANIN</p>
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col overflow-y-auto main-background" style="min-width: 0;">
+        <header class="bg-white/90 backdrop-blur-md px-3 md:px-6 py-3 flex justify-between items-center shadow-sm sticky top-0 z-10 border-b border-gold/20">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+                <button id="btn-toggle-sidebar" onclick="toggleSidebar()" title="Menu">☰</button>
+                <div class="min-w-0 flex-1">
+                    <h2 class="text-lg md:text-2xl lg:text-3xl font-elegant text-navy truncate" id="page-title">Dashboard</h2>
+                    <p class="text-xs md:text-sm text-slate-500 truncate" id="page-subtitle">Sistem Kasir Sate Taichan ANIN</p>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-2 md:space-x-6">
-                <div class="text-right hidden sm:block">
-                    <p class="text-xs md:text-sm font-semibold font-modern text-navy" id="current-date">-</p>
-                    <p class="text-xs font-modern text-slate-500" id="current-time">-</p>
+            <div class="flex items-center gap-2 md:gap-4">
+                <div class="text-right hidden lg:block">
+                    <p class="text-xs font-semibold text-navy" id="current-date">-</p>
+                    <p class="text-xs text-slate-500" id="current-time">-</p>
                 </div>
-                <div class="flex items-center space-x-2 border-l border-gold/30 pl-2 md:pl-4">
-                    <div class="w-8 h-8 md:w-10 md:h-10 bg-navy rounded-full flex items-center justify-center text-gold font-bold border border-gold shadow-sm font-elegant">K</div>
-                    <div class="hidden md:block">
-                        <p class="text-sm font-bold font-modern text-navy">Kasir</p>
-                        <p class="text-xs font-modern text-slate-500">Kasir</p>
-                    </div>
-                </div>
+                <div class="w-9 h-9 md:w-10 md:h-10 bg-navy rounded-full flex items-center justify-center text-gold font-bold border border-gold shadow-sm font-elegant text-sm">K</div>
             </div>
         </header>
 
         <!-- DASHBOARD -->
-        <div id="page-dashboard" class="page-content p-3 md:p-6 lg:p-8 space-y-4 md:space-y-6">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-                <div class="card-db p-3 md:p-5 flex items-center space-x-2 md:space-x-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-navy text-gold rounded-full flex items-center justify-center text-lg md:text-xl shadow-inner border border-gold/30 shrink-0">💰</div>
+        <div id="page-dashboard" class="page-content p-3 md:p-6 space-y-3 md:space-y-6">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
+                <div class="card-db p-3 flex items-center gap-2 md:gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-navy text-gold rounded-full flex items-center justify-center text-lg shrink-0">💰</div>
                     <div class="min-w-0 flex-1">
-                        <p class="text-xs font-modern text-slate-500 uppercase tracking-wider truncate">Penjualan Hari Ini</p>
-                        <p class="text-lg md:text-2xl font-elegant text-navy truncate" id="dash-total-penjualan">Rp 0</p>
-                        <p class="text-xs text-green-600 font-modern hidden md:block">↑ 12% dari kemarin</p>
+                        <p class="text-xs text-slate-500 truncate dash-label">Penjualan Hari Ini</p>
+                        <p class="text-base md:text-2xl font-elegant text-navy truncate dash-num" id="dash-total-penjualan">Rp 0</p>
                     </div>
                 </div>
-                <div class="card-db p-3 md:p-5 flex items-center space-x-2 md:space-x-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-navy text-gold rounded-full flex items-center justify-center text-lg md:text-xl shadow-inner border border-gold/30 shrink-0">🧾</div>
+                <div class="card-db p-3 flex items-center gap-2 md:gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-navy text-gold rounded-full flex items-center justify-center text-lg shrink-0">🧾</div>
                     <div class="min-w-0 flex-1">
-                        <p class="text-xs font-modern text-slate-500 uppercase tracking-wider truncate">Transaksi</p>
-                        <p class="text-lg md:text-2xl font-elegant text-navy truncate" id="dash-jumlah-transaksi">0</p>
-                        <p class="text-xs text-green-600 font-modern hidden md:block">↑ 8% dari kemarin</p>
+                        <p class="text-xs text-slate-500 truncate dash-label">Transaksi</p>
+                        <p class="text-base md:text-2xl font-elegant text-navy truncate dash-num" id="dash-jumlah-transaksi">0</p>
                     </div>
                 </div>
-                <div class="card-db p-3 md:p-5 flex items-center space-x-2 md:space-x-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-navy text-gold rounded-full flex items-center justify-center text-lg md:text-xl shadow-inner border border-gold/30 shrink-0">🏆</div>
+                <div class="card-db p-3 flex items-center gap-2 md:gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-navy text-gold rounded-full flex items-center justify-center text-lg shrink-0">🏆</div>
                     <div class="min-w-0 flex-1">
-                        <p class="text-xs font-modern text-slate-500 uppercase tracking-wider truncate">Terlaris</p>
-                        <p class="text-sm md:text-lg font-elegant text-navy truncate" id="dash-menu-terlaris">-</p>
-                        <p class="text-xs text-green-600 font-modern hidden md:block">↑ 15% dari kemarin</p>
+                        <p class="text-xs text-slate-500 truncate dash-label">Terlaris</p>
+                        <p class="text-sm md:text-lg font-elegant text-navy truncate dash-num" id="dash-menu-terlaris">-</p>
                     </div>
                 </div>
-                <div class="card-db p-3 md:p-5 flex items-center space-x-2 md:space-x-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-navy text-gold rounded-full flex items-center justify-center text-lg md:text-xl shadow-inner border border-gold/30 shrink-0">📦</div>
+                <div class="card-db p-3 flex items-center gap-2 md:gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-navy text-gold rounded-full flex items-center justify-center text-lg shrink-0">📦</div>
                     <div class="min-w-0 flex-1">
-                        <p class="text-xs font-modern text-slate-500 uppercase tracking-wider truncate">Stok Menipis</p>
-                        <p class="text-lg md:text-2xl font-elegant text-navy truncate" id="dash-stok-menipis">0</p>
-                        <p class="text-xs text-red-500 font-modern hidden md:block">⚠️ Perlu perhatian</p>
+                        <p class="text-xs text-slate-500 truncate dash-label">Stok Menipis</p>
+                        <p class="text-base md:text-2xl font-elegant text-navy truncate dash-num" id="dash-stok-menipis">0</p>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6">
                 <div class="lg:col-span-2 card-db p-3 md:p-5">
-                    <h3 class="font-elegant text-base md:text-lg text-navy mb-3 md:mb-4 border-b border-gold/30 pb-2">Grafik Penjualan 7 Hari Terakhir</h3>
-                    <div class="h-48 md:h-64"><canvas id="salesChart"></canvas></div>
+                    <h3 class="font-elegant text-sm md:text-lg text-navy mb-2 md:mb-4 border-b border-gold/30 pb-2">Grafik Penjualan 7 Hari</h3>
+                    <div class="h-40 md:h-64"><canvas id="salesChart"></canvas></div>
                 </div>
                 <div class="card-db p-3 md:p-5">
-                    <h3 class="font-elegant text-base md:text-lg text-navy mb-3 md:mb-4 border-b border-gold/30 pb-2">Produk Terlaris</h3>
+                    <h3 class="font-elegant text-sm md:text-lg text-navy mb-2 md:mb-4 border-b border-gold/30 pb-2">Produk Terlaris</h3>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-xs md:text-sm text-left font-modern">
-                            <thead class="text-xs text-slate-500 uppercase tracking-wider bg-cream">
-                                <tr><th class="px-2 py-2 rounded-l">No</th><th class="px-2 py-2">Nama</th><th class="px-2 py-2 text-right rounded-r">Qty</th></tr>
+                        <table class="w-full text-xs md:text-sm text-left">
+                            <thead class="text-xs text-slate-500 bg-cream">
+                                <tr><th class="px-2 py-1.5">No</th><th class="px-2 py-1.5">Nama</th><th class="px-2 py-1.5 text-right">Qty</th></tr>
                             </thead>
                             <tbody id="dash-produk-terlaris-body" class="text-navy"></tbody>
                         </table>
@@ -509,51 +398,51 @@
         </div>
 
         <!-- POS -->
-        <div id="page-pos" class="page-content p-3 md:p-6 lg:p-8 hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6 lg:h-[calc(100vh-140px)]">
-                <div class="lg:col-span-2 card-db p-3 md:p-5 flex flex-col overflow-hidden">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-3 md:mb-4 border-b border-gold/30 pb-3">
-                        <h3 class="font-elegant text-base md:text-lg text-navy">Daftar Menu</h3>
-                        <div class="flex flex-wrap gap-1 md:gap-2 text-xs md:text-sm font-modern">
-                            <button onclick="filterMenu('Semua', event)" class="filter-btn bg-navy text-white px-2 md:px-4 py-1 md:py-1.5 rounded-full btn-db text-xs">Semua</button>
-                            <button onclick="filterMenu('Sate', event)" class="filter-btn bg-gray-100 text-navy px-2 md:px-4 py-1 md:py-1.5 rounded-full btn-db text-xs">Sate</button>
-                            <button onclick="filterMenu('Tambahan', event)" class="filter-btn bg-gray-100 text-navy px-2 md:px-4 py-1 md:py-1.5 rounded-full btn-db text-xs">Tambahan</button>
-                            <button onclick="filterMenu('Minuman', event)" class="filter-btn bg-gray-100 text-navy px-2 md:px-4 py-1 md:py-1.5 rounded-full btn-db text-xs">Minuman</button>
+        <div id="page-pos" class="page-content p-3 md:p-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6">
+                <div class="lg:col-span-2 card-db p-3 md:p-5">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-3 border-b border-gold/30 pb-3">
+                        <h3 class="font-elegant text-sm md:text-lg text-navy">Daftar Menu</h3>
+                        <div class="flex flex-wrap gap-1">
+                            <button onclick="filterMenu('Semua', event)" class="filter-btn bg-navy text-white px-3 py-1 rounded-full text-xs">Semua</button>
+                            <button onclick="filterMenu('Sate', event)" class="filter-btn bg-gray-100 text-navy px-3 py-1 rounded-full text-xs">Sate</button>
+                            <button onclick="filterMenu('Tambahan', event)" class="filter-btn bg-gray-100 text-navy px-3 py-1 rounded-full text-xs">Tambahan</button>
+                            <button onclick="filterMenu('Minuman', event)" class="filter-btn bg-gray-100 text-navy px-3 py-1 rounded-full text-xs">Minuman</button>
                         </div>
                     </div>
-                    <div id="pos-menu-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-4 overflow-y-auto hide-scrollbar pb-4"></div>
+                    <div id="pos-menu-container" class="menu-grid grid grid-cols-2 gap-2 md:gap-3"></div>
                 </div>
 
-                <div class="card-db p-3 md:p-5 flex flex-col">
-                    <div class="flex justify-between items-center mb-3 md:mb-4 border-b border-gold/30 pb-3">
-                        <h3 class="font-elegant text-base md:text-lg text-navy">Keranjang Pesanan</h3>
-                        <button onclick="clearCart()" class="text-red-500 text-xs font-modern hover:underline">Hapus Semua</button>
+                <div class="card-db p-3 md:p-5">
+                    <div class="flex justify-between items-center mb-3 border-b border-gold/30 pb-2">
+                        <h3 class="font-elegant text-sm md:text-lg text-navy">Keranjang</h3>
+                        <button onclick="clearCart()" class="text-red-500 text-xs hover:underline">Hapus</button>
                     </div>
-                    <div id="cart-container" class="flex-1 space-y-3 overflow-y-auto hide-scrollbar mb-4 font-modern max-h-[300px] lg:max-h-none"></div>
-                    <div class="border-t border-gold/30 pt-4 space-y-2 text-sm font-modern">
-                        <div class="flex justify-between text-slate-600"><span>Subtotal</span><span id="cart-subtotal">Rp 0</span></div>
-                        <div class="flex justify-between font-bold text-xl text-navy mt-2 border-t border-dashed border-gold/30 pt-2 total-price"><span>Total</span><span id="cart-total">Rp 0</span></div>
-                        <div class="grid grid-cols-2 gap-2 mt-4">
-                            <button onclick="setPaymentMethod('Tunai')" id="btn-Tunai" class="payment-btn bg-navy text-white py-2 rounded-lg font-semibold text-xs btn-db">Tunai</button>
-                            <button onclick="setPaymentMethod('QRIS')" id="btn-QRIS" class="payment-btn bg-gray-100 text-navy py-2 rounded-lg font-semibold text-xs btn-db">QRIS</button>
+                    <div id="cart-container" class="space-y-2 mb-3 max-h-[250px] overflow-y-auto hide-scrollbar"></div>
+                    <div class="border-t border-gold/30 pt-3 space-y-2">
+                        <div class="flex justify-between text-xs"><span>Subtotal</span><span id="cart-subtotal">Rp 0</span></div>
+                        <div class="flex justify-between font-bold text-base md:text-xl text-navy border-t border-dashed border-gold/30 pt-2"><span>Total</span><span id="cart-total">Rp 0</span></div>
+                        <div class="grid grid-cols-2 gap-2 mt-3">
+                            <button onclick="setPaymentMethod('Tunai')" id="btn-Tunai" class="payment-btn bg-navy text-white py-2 rounded-lg font-semibold text-xs">Tunai</button>
+                            <button onclick="setPaymentMethod('QRIS')" id="btn-QRIS" class="payment-btn bg-gray-100 text-navy py-2 rounded-lg font-semibold text-xs">QRIS</button>
                         </div>
-                        <button onclick="prosesPembayaran()" id="btn-bayar" class="w-full bg-gold text-white py-3 rounded-lg font-bold font-elegant text-base md:text-lg mt-2 btn-db shadow-md btn-bayar">Bayar</button>
+                        <button onclick="prosesPembayaran()" id="btn-bayar" class="w-full bg-gold text-white py-3 rounded-lg font-bold font-elegant text-base mt-2 shadow-md btn-bayar">BAYAR</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- MENU -->
-        <div id="page-menu" class="page-content p-3 md:p-6 lg:p-8 hidden">
+        <div id="page-menu" class="page-content p-3 md:p-6 hidden">
             <div class="card-db p-3 md:p-6">
-                <div class="flex justify-between items-center gap-2 mb-4 md:mb-6 border-b border-gold/30 pb-3">
-                    <h3 class="font-elegant text-base md:text-lg text-navy">Manajemen Menu</h3>
-                    <button onclick="openModal('modal-menu')" class="bg-navy text-gold px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs font-modern btn-db whitespace-nowrap">+ Tambah</button>
+                <div class="flex justify-between items-center gap-2 mb-4 border-b border-gold/30 pb-3">
+                    <h3 class="font-elegant text-sm md:text-lg text-navy">Manajemen Menu</h3>
+                    <button onclick="openModal('modal-menu')" class="bg-navy text-gold px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">+ Tambah</button>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full min-w-[600px] text-xs md:text-sm text-left font-modern">
-                        <thead class="text-xs text-slate-500 uppercase tracking-wider bg-cream">
-                            <tr><th class="px-3 py-3 rounded-l">ID</th><th class="px-3 py-3">Nama Menu</th><th class="px-3 py-3">Kategori</th><th class="px-3 py-3">Harga</th><th class="px-3 py-3">Status</th><th class="px-3 py-3 text-center rounded-r">Aksi</th></tr>
+                    <table class="w-full min-w-[500px] text-xs md:text-sm text-left">
+                        <thead class="text-xs text-slate-500 bg-cream">
+                            <tr><th class="px-2 py-2">ID</th><th class="px-2 py-2">Nama</th><th class="px-2 py-2">Kategori</th><th class="px-2 py-2">Harga</th><th class="px-2 py-2">Status</th><th class="px-2 py-2 text-center">Aksi</th></tr>
                         </thead>
                         <tbody id="menu-table-body" class="text-navy"></tbody>
                     </table>
@@ -562,16 +451,16 @@
         </div>
 
         <!-- STOK -->
-        <div id="page-stok" class="page-content p-3 md:p-6 lg:p-8 hidden">
+        <div id="page-stok" class="page-content p-3 md:p-6 hidden">
             <div class="card-db p-3 md:p-6">
-                <div class="flex justify-between items-center gap-2 mb-4 md:mb-6 border-b border-gold/30 pb-3">
-                    <h3 class="font-elegant text-base md:text-lg text-navy">Manajemen Stok Bahan</h3>
-                    <button onclick="openModal('modal-stok')" class="bg-navy text-gold px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs font-modern btn-db whitespace-nowrap">+ Tambah</button>
+                <div class="flex justify-between items-center gap-2 mb-4 border-b border-gold/30 pb-3">
+                    <h3 class="font-elegant text-sm md:text-lg text-navy">Manajemen Stok</h3>
+                    <button onclick="openModal('modal-stok')" class="bg-navy text-gold px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">+ Tambah</button>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full min-w-[500px] text-xs md:text-sm text-left font-modern">
-                        <thead class="text-xs text-slate-500 uppercase tracking-wider bg-cream">
-                            <tr><th class="px-3 py-3 rounded-l">ID</th><th class="px-3 py-3">Nama Bahan</th><th class="px-3 py-3">Stok</th><th class="px-3 py-3">Satuan</th><th class="px-3 py-3 text-center rounded-r">Aksi</th></tr>
+                    <table class="w-full min-w-[400px] text-xs md:text-sm text-left">
+                        <thead class="text-xs text-slate-500 bg-cream">
+                            <tr><th class="px-2 py-2">ID</th><th class="px-2 py-2">Nama Bahan</th><th class="px-2 py-2">Stok</th><th class="px-2 py-2">Satuan</th><th class="px-2 py-2 text-center">Aksi</th></tr>
                         </thead>
                         <tbody id="stok-table-body" class="text-navy"></tbody>
                     </table>
@@ -580,13 +469,13 @@
         </div>
 
         <!-- LAPORAN -->
-        <div id="page-laporan" class="page-content p-3 md:p-6 lg:p-8 hidden">
+        <div id="page-laporan" class="page-content p-3 md:p-6 hidden">
             <div class="card-db p-3 md:p-6">
-                <h3 class="font-elegant text-base md:text-lg text-navy mb-4 md:mb-6 border-b border-gold/30 pb-3">Riwayat Transaksi</h3>
+                <h3 class="font-elegant text-sm md:text-lg text-navy mb-4 border-b border-gold/30 pb-3">Riwayat Transaksi</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full min-w-[700px] text-xs md:text-sm text-left font-modern">
-                        <thead class="text-xs text-slate-500 uppercase tracking-wider bg-cream">
-                            <tr><th class="px-3 py-3 rounded-l">ID</th><th class="px-3 py-3">Tanggal</th><th class="px-3 py-3">Total</th><th class="px-3 py-3">Metode</th><th class="px-3 py-3 rounded-r">Detail Item</th></tr>
+                    <table class="w-full min-w-[600px] text-xs md:text-sm text-left">
+                        <thead class="text-xs text-slate-500 bg-cream">
+                            <tr><th class="px-2 py-2">ID</th><th class="px-2 py-2">Tanggal</th><th class="px-2 py-2">Total</th><th class="px-2 py-2">Metode</th><th class="px-2 py-2">Detail</th></tr>
                         </thead>
                         <tbody id="laporan-table-body" class="text-navy"></tbody>
                     </table>
@@ -595,42 +484,46 @@
         </div>
     </main>
 
+    <!-- FAB Toggle untuk mobile -->
+    <button class="fab-toggle" onclick="toggleSidebar()" title="Menu">☰</button>
+
+    <!-- MODAL MENU -->
     <div id="modal-menu" class="modal">
-        <div class="card-db rounded-xl p-4 md:p-6 w-96 border border-gold/30 max-w-[95vw]">
-            <h3 class="font-elegant text-lg md:text-xl text-navy mb-4 text-center">Tambah Menu Baru</h3>
-            <input type="text" id="input-nama-menu" placeholder="Nama Menu" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm font-modern focus:outline-none focus:border-gold bg-cream">
-            <select id="input-kategori-menu" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm font-modern focus:outline-none focus:border-gold bg-cream">
+        <div class="card-db rounded-xl p-4 md:p-6 w-full max-w-sm">
+            <h3 class="font-elegant text-lg text-navy mb-4 text-center">Tambah Menu Baru</h3>
+            <input type="text" id="input-nama-menu" placeholder="Nama Menu" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm bg-cream">
+            <select id="input-kategori-menu" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm bg-cream">
                 <option value="Sate">Sate</option>
                 <option value="Tambahan">Tambahan</option>
                 <option value="Minuman">Minuman</option>
             </select>
-            <input type="number" id="input-harga-menu" placeholder="Harga (Rp)" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm font-modern focus:outline-none focus:border-gold bg-cream">
-            <div class="flex justify-end space-x-2 mt-4">
-                <button onclick="closeModal('modal-menu')" class="px-4 py-2 text-sm font-modern text-slate-600 hover:bg-gray-100 rounded">Batal</button>
-                <button onclick="simpanMenu()" class="px-4 py-2 text-sm font-modern bg-navy text-gold rounded-lg btn-db">Simpan</button>
+            <input type="number" id="input-harga-menu" placeholder="Harga (Rp)" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm bg-cream">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('modal-menu')" class="px-4 py-2 text-sm text-slate-600">Batal</button>
+                <button onclick="simpanMenu()" class="px-4 py-2 text-sm bg-navy text-gold rounded-lg">Simpan</button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL STOK -->
     <div id="modal-stok" class="modal">
-        <div class="card-db rounded-xl p-4 md:p-6 w-96 border border-gold/30 max-w-[95vw]">
-            <h3 class="font-elegant text-lg md:text-xl text-navy mb-4 text-center">Tambah Bahan Baru</h3>
-            <input type="text" id="input-nama-bahan" placeholder="Nama Bahan" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm font-modern focus:outline-none focus:border-gold bg-cream">
-            <input type="number" id="input-stok-bahan" placeholder="Jumlah Stok" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm font-modern focus:outline-none focus:border-gold bg-cream">
-            <input type="text" id="input-satuan-bahan" placeholder="Satuan (contoh: kg, pcs)" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm font-modern focus:outline-none focus:border-gold bg-cream">
-            <div class="flex justify-end space-x-2 mt-4">
-                <button onclick="closeModal('modal-stok')" class="px-4 py-2 text-sm font-modern text-slate-600 hover:bg-gray-100 rounded">Batal</button>
-                <button onclick="simpanStok()" class="px-4 py-2 text-sm font-modern bg-navy text-gold rounded-lg btn-db">Simpan</button>
+        <div class="card-db rounded-xl p-4 md:p-6 w-full max-w-sm">
+            <h3 class="font-elegant text-lg text-navy mb-4 text-center">Tambah Bahan Baru</h3>
+            <input type="text" id="input-nama-bahan" placeholder="Nama Bahan" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm bg-cream">
+            <input type="number" id="input-stok-bahan" placeholder="Jumlah Stok" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm bg-cream">
+            <input type="text" id="input-satuan-bahan" placeholder="Satuan (kg/pcs)" class="w-full border border-gold/30 p-2 rounded mb-3 text-sm bg-cream">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('modal-stok')" class="px-4 py-2 text-sm text-slate-600">Batal</button>
+                <button onclick="simpanStok()" class="px-4 py-2 text-sm bg-navy text-gold rounded-lg">Simpan</button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL STRUK -->
     <div id="modal-struk" class="modal">
-        <div class="struk-container" id="struk-content">
-            <div class="struk-header">
-                <div class="struk-logo">
-                    <img src="images/logo.png" alt="Logo" class="w-16 h-16 rounded-full border border-gold" loading="lazy">
-                </div>
+        <div class="struk-container">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <img src="images/logo.png" alt="Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; margin: 0 auto;" onerror="this.onerror=null;this.src='https://placehold.co/80x80/0F172A/C9A227?text=★'">
                 <h2 class="struk-title">SATE TAICHAN ANIN</h2>
                 <p class="struk-subtitle">Sate Taichan Rasa Sederhana, Nikmat Luar Biasa!</p>
                 <p class="struk-address">Jl. Grand Line No. 777, East Blue</p>
@@ -638,30 +531,29 @@
             </div>
             <div class="struk-divider"></div>
             <div class="struk-info">
-                <div class="struk-info-row"><span>No. Transaksi</span><span id="struk-id">TRX-000</span></div>
+                <div class="struk-info-row"><span>No. Transaksi</span><span id="struk-id">-</span></div>
                 <div class="struk-info-row"><span>Tanggal</span><span id="struk-tanggal">-</span></div>
                 <div class="struk-info-row"><span>Kasir</span><span>Kasir</span></div>
-                <div class="struk-info-row"><span>Metode</span><span id="struk-metode">Tunai</span></div>
+                <div class="struk-info-row"><span>Metode</span><span id="struk-metode">-</span></div>
             </div>
             <div class="struk-divider"></div>
             <div class="struk-items" id="struk-items"></div>
             <div class="struk-divider"></div>
-            <div class="struk-total">
+            <div>
                 <div class="struk-total-row"><span>Subtotal</span><span id="struk-subtotal">Rp 0</span></div>
                 <div class="struk-total-row struk-grand-total"><span>TOTAL</span><span id="struk-total">Rp 0</span></div>
             </div>
             <div class="struk-divider"></div>
-            <div class="struk-footer">
+            <div>
                 <p class="struk-thanks">TERIMA KASIH</p>
                 <p class="struk-message">Selamat menikmati hidangan kami!</p>
-                <p class="struk-message">Semoga harimu menyenangkan</p>
                 <div class="struk-barcode">
                     <div class="barcode-lines"></div>
-                    <p class="struk-barcode-text" id="struk-barcode-text">TRX-000000</p>
+                    <p class="struk-barcode-text" id="struk-barcode-text">TRX-000</p>
                 </div>
             </div>
-            <div class="struk-actions no-print">
-                <button onclick="cetakStruk()" class="btn-struk btn-cetak">🖨️ Cetak Struk</button>
+            <div class="struk-actions">
+                <button onclick="cetakStruk()" class="btn-struk btn-cetak">🖨️ Cetak</button>
                 <button onclick="closeModal('modal-struk')" class="btn-struk btn-tutup">✖ Tutup</button>
             </div>
         </div>
@@ -671,33 +563,10 @@
         'use strict';
 
         const STORAGE_KEYS = Object.freeze({ MENU: 'menuData', STOK: 'stokData', TRANSAKSI: 'transaksiData', VERSION: 'appVersion' });
-        const APP_VERSION = '6.4';
+        const APP_VERSION = '7.0';
 
         const $ = (id) => document.getElementById(id);
-        const DOM = {};
 
-        function cacheDOM() {
-            DOM.pageTitle = $('page-title');
-            DOM.pageSubtitle = $('page-subtitle');
-            DOM.currentDate = $('current-date');
-            DOM.currentTime = $('current-time');
-            DOM.dashTotal = $('dash-total-penjualan');
-            DOM.dashJumlah = $('dash-jumlah-transaksi');
-            DOM.dashTerlaris = $('dash-menu-terlaris');
-            DOM.dashStok = $('dash-stok-menipis');
-            DOM.dashProduk = $('dash-produk-terlaris-body');
-            DOM.posMenu = $('pos-menu-container');
-            DOM.cartContainer = $('cart-container');
-            DOM.cartSubtotal = $('cart-subtotal');
-            DOM.cartTotal = $('cart-total');
-            DOM.menuTable = $('menu-table-body');
-            DOM.stokTable = $('stok-table-body');
-            DOM.laporanTable = $('laporan-table-body');
-            DOM.btnBayar = $('btn-bayar');
-            DOM.strukItems = $('struk-items');
-        }
-
-        let saveTimeout = null;
         const saveToStorage = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch (e) { return false; } };
         const loadFromStorage = (key, def = []) => { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : def; } catch (e) { return def; } };
         
@@ -707,6 +576,7 @@
             saveToStorage(STORAGE_KEYS.TRANSAKSI, transaksiData); 
         };
         
+        let saveTimeout = null;
         function saveAllDataDebounced() {
             if (saveTimeout) clearTimeout(saveTimeout);
             saveTimeout = setTimeout(_saveAll, 300);
@@ -724,11 +594,11 @@
             return false;
         }
 
-        const DEFAULT_MENU = Object.freeze([
+        const DEFAULT_MENU = [
             { id: 1, nama: "Taichan Full Daging", harga: 27000, kategori: "Sate", gambar: "images/sate.jpg", status: "Tersedia" },
             { id: 2, nama: "Taichan Full Kulit", harga: 27000, kategori: "Sate", gambar: "images/sate.jpg", status: "Tersedia" },
-            { id: 3, nama: "Taichan Campur (kulit&daging)", harga: 27000, kategori: "Sate", gambar: "images/sate.jpg", status: "Tersedia" },
-            { id: 4, nama: "Mix Platter (isi 15 tusuk)", harga: 35000, kategori: "Sate", gambar: "images/sate.jpg", status: "Tersedia" },
+            { id: 3, nama: "Taichan Campur", harga: 27000, kategori: "Sate", gambar: "images/sate.jpg", status: "Tersedia" },
+            { id: 4, nama: "Mix Platter", harga: 35000, kategori: "Sate", gambar: "images/sate.jpg", status: "Tersedia" },
             { id: 5, nama: "Lontong", harga: 3000, kategori: "Tambahan", gambar: "images/lontong.jpg", status: "Tersedia" },
             { id: 6, nama: "Extra Sambal", harga: 3000, kategori: "Tambahan", gambar: "images/sambal.jpg", status: "Tersedia" },
             { id: 7, nama: "NutriSari", harga: 5000, kategori: "Minuman", gambar: "images/nutrisari.jpg", status: "Tersedia" },
@@ -738,14 +608,14 @@
             { id: 11, nama: "Teh Tarik", harga: 7000, kategori: "Minuman", gambar: "images/tehtarik.jpg", status: "Tersedia" },
             { id: 12, nama: "Kopi", harga: 5000, kategori: "Minuman", gambar: "images/kopi.jpg", status: "Tersedia" },
             { id: 13, nama: "Air Mineral", harga: 4000, kategori: "Minuman", gambar: "images/airmineral.jpg", status: "Tersedia" }
-        ]);
+        ];
 
-        const DEFAULT_STOK = Object.freeze([
+        const DEFAULT_STOK = [
             { id: 1, nama: "Daging Ayam", stok: 5, satuan: "kg" },
             { id: 2, nama: "Kulit Ayam", stok: 3, satuan: "kg" },
             { id: 3, nama: "Lontong", stok: 20, satuan: "pcs" },
             { id: 4, nama: "Sambal", stok: 10, satuan: "porsi" }
-        ]);
+        ];
 
         let menuData = loadFromStorage(STORAGE_KEYS.MENU, DEFAULT_MENU);
         let stokData = loadFromStorage(STORAGE_KEYS.STOK, DEFAULT_STOK);
@@ -765,62 +635,45 @@
         const formatRp = (n) => `Rp ${n.toLocaleString('id-ID')}`;
         const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-        const imageCache = new Set();
-        let idleTimer = null;
-        function preloadImage(src) {
-            if (!src || imageCache.has(src)) return;
-            imageCache.add(src);
-            const img = new Image();
-            img.src = src;
-        }
-        
-        function preloadImagesIdle(sources) {
-            if (idleTimer) clearTimeout(idleTimer);
-            idleTimer = setTimeout(() => {
-                const preload = () => sources.forEach(preloadImage);
-                if ('requestIdleCallback' in window) {
-                    requestIdleCallback(preload, { timeout: 2000 });
-                } else {
-                    preload();
-                }
-            }, 500);
-        }
-
+        // ==================== TOGGLE SIDEBAR ====================
         function toggleSidebar() {
             const sidebar = $('sidebar');
             const overlay = $('sidebar-overlay');
-            const icon = $('toggle-icon');
             
             if (!sidebar) return;
             
-            const isMobile = window.innerWidth < 768;
+            const isMobile = window.innerWidth < 1024;
             
             if (isMobile) {
-                sidebar.classList.toggle('mobile-open');
-                if (overlay) overlay.classList.toggle('active');
+                const isOpen = sidebar.classList.contains('mobile-open');
+                if (isOpen) {
+                    sidebar.classList.remove('mobile-open');
+                    overlay.classList.remove('active');
+                } else {
+                    sidebar.classList.add('mobile-open');
+                    overlay.classList.add('active');
+                }
             } else {
                 sidebar.classList.toggle('collapsed');
-                if (icon) {
-                    icon.innerText = sidebar.classList.contains('collapsed') ? '»' : '☰';
-                }
             }
         }
 
         window.addEventListener('resize', () => {
             const sidebar = $('sidebar');
             const overlay = $('sidebar-overlay');
-            if (window.innerWidth >= 768) {
-                sidebar?.classList.remove('mobile-open');
-                overlay?.classList.remove('active');
+            if (window.innerWidth >= 1024) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
             }
         });
 
+        // ==================== NAVIGASI ====================
         const pageTitles = {
-            dashboard: ['Dashboard', 'Selamat datang di Sistem Kasir Sate Taichan ANIN'],
-            pos: ['Penjualan / POS', 'Pilih menu untuk ditambahkan ke keranjang'],
+            dashboard: ['Dashboard', 'Selamat datang di Sistem Kasir ANIN'],
+            pos: ['Penjualan / POS', 'Pilih menu untuk ditambahkan'],
             menu: ['Manajemen Menu', 'Kelola daftar menu restoran'],
-            stok: ['Manajemen Stok', 'Pantau ketersediaan bahan baku'],
-            laporan: ['Laporan Penjualan', 'Lihat riwayat transaksi']
+            stok: ['Manajemen Stok', 'Pantau ketersediaan bahan'],
+            laporan: ['Laporan', 'Lihat riwayat transaksi']
         };
 
         function showPage(page) {
@@ -828,9 +681,6 @@
             const activePage = $(`page-${page}`);
             if (!activePage) return;
             activePage.classList.remove('hidden');
-            activePage.style.animation = 'none';
-            void activePage.offsetHeight;
-            activePage.style.animation = 'slideIn 0.3s ease-out';
 
             document.querySelectorAll('.nav-link').forEach(el => {
                 el.classList.remove('bg-gold/20', 'text-gold', 'font-semibold');
@@ -843,14 +693,12 @@
             }
 
             const [title, subtitle] = pageTitles[page] || ['Dashboard', ''];
-            DOM.pageTitle.innerText = title;
-            DOM.pageSubtitle.innerText = subtitle;
+            $('page-title').innerText = title;
+            $('page-subtitle').innerText = subtitle;
 
-            if (window.innerWidth < 768) {
-                const sidebar = $('sidebar');
-                const overlay = $('sidebar-overlay');
-                sidebar?.classList.remove('mobile-open');
-                overlay?.classList.remove('active');
+            if (window.innerWidth < 1024) {
+                $('sidebar').classList.remove('mobile-open');
+                $('sidebar-overlay').classList.remove('active');
             }
 
             switch (page) {
@@ -866,8 +714,10 @@
             const now = new Date();
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            DOM.currentDate.innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-            DOM.currentTime.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const el1 = $('current-date');
+            const el2 = $('current-time');
+            if (el1) el1.innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+            if (el2) el2.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
         }
 
         function renderDashboard() {
@@ -882,8 +732,8 @@
                 }
             }
             
-            DOM.dashTotal.innerText = formatRp(totalHariIni);
-            DOM.dashJumlah.innerText = countHariIni;
+            $('dash-total-penjualan').innerText = formatRp(totalHariIni);
+            $('dash-jumlah-transaksi').innerText = countHariIni;
 
             const menuCount = new Map();
             for (let i = 0; i < transaksiData.length; i++) {
@@ -894,21 +744,21 @@
                 }
             }
             const sortedMenu = [...menuCount.entries()].sort((a, b) => b[1] - a[1]);
-            DOM.dashTerlaris.innerText = sortedMenu.length ? sortedMenu[0][0] : '-';
+            $('dash-menu-terlaris').innerText = sortedMenu.length ? sortedMenu[0][0] : '-';
 
+            const tbody = $('dash-produk-terlaris-body');
+            tbody.innerHTML = '';
             const frag = document.createDocumentFragment();
-            const top5 = sortedMenu.slice(0, 5);
-            for (let i = 0; i < top5.length; i++) {
-                const [nama, jumlah] = top5[i];
+            sortedMenu.slice(0, 5).forEach(([nama, jumlah], i) => {
                 const tr = document.createElement('tr');
                 tr.className = 'border-b border-gold/10';
-                tr.innerHTML = `<td class="px-3 py-2">${i + 1}</td><td class="px-3 py-2 font-medium">${escapeHtml(nama)}</td><td class="px-3 py-2 text-right">${jumlah}</td>`;
+                tr.innerHTML = `<td class="px-2 py-1.5">${i + 1}</td><td class="px-2 py-1.5 truncate">${escapeHtml(nama)}</td><td class="px-2 py-1.5 text-right">${jumlah}</td>`;
                 frag.appendChild(tr);
-            }
-            DOM.dashProduk.replaceChildren(frag);
+            });
+            tbody.appendChild(frag);
 
             const stokMenipis = stokData.filter(s => s.stok < 5).length;
-            DOM.dashStok.innerText = `${stokMenipis}`;
+            $('dash-stok-menipis').innerText = stokMenipis;
 
             if (window.Chart) renderChart();
             else setTimeout(renderChart, 200);
@@ -925,9 +775,7 @@
                 const d = new Date(); d.setDate(d.getDate() - i);
                 const dateStr = d.toISOString().split('T')[0];
                 labels.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
-                data.push(transaksiData
-                    .filter(t => t.tanggal.startsWith(dateStr))
-                    .reduce((sum, t) => sum + t.total, 0));
+                data.push(transaksiData.filter(t => t.tanggal.startsWith(dateStr)).reduce((sum, t) => sum + t.total, 0));
             }
             
             if (salesChartInstance) {
@@ -937,16 +785,13 @@
             } else {
                 salesChartInstance = new Chart(ctx, {
                     type: 'line',
-                    data: { labels, datasets: [{ label: 'Penjualan (Rp)', data, borderColor: '#C9A227', backgroundColor: 'rgba(201, 162, 39, 0.1)', tension: 0.4, fill: true, pointBackgroundColor: '#0F172A', pointBorderColor: '#C9A227', pointRadius: 4, pointHoverRadius: 6 }] },
-                    options: { responsive: true, maintainAspectRatio: false, animation: { duration: 300 }, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: v => 'Rp ' + (v/1000) + 'k', font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } } }
+                    data: { labels, datasets: [{ label: 'Penjualan', data, borderColor: '#C9A227', backgroundColor: 'rgba(201, 162, 39, 0.1)', tension: 0.4, fill: true, pointBackgroundColor: '#0F172A', pointBorderColor: '#C9A227', pointRadius: 3 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: v => (v/1000) + 'k', font: { size: 9 } } }, x: { ticks: { font: { size: 9 } } } } }
                 });
             }
         }
 
-        function renderPOS() { 
-            renderMenuPOS(); 
-            renderKeranjang(); 
-        }
+        function renderPOS() { renderMenuPOS(); renderKeranjang(); }
         
         function filterMenu(kategori, evt) {
             filterKategori = kategori;
@@ -966,23 +811,17 @@
                 ? menuData.filter(m => m.status !== 'Habis')
                 : menuData.filter(m => m.kategori === filterKategori && m.status !== 'Habis');
             
-            preloadImagesIdle(filtered.map(m => m.gambar).filter(Boolean));
-            
-            const html = filtered.map((menu, index) => {
-                const imgSrc = menu.gambar || `https://placehold.co/300x200/F8F5EF/0F172A?text=${encodeURIComponent(menu.nama)}`;
-                const fallback = `https://placehold.co/300x200/F8F5EF/0F172A?text=${encodeURIComponent(menu.nama)}`;
+            const container = $('pos-menu-container');
+            container.innerHTML = filtered.map(menu => {
+                const fallback = `https://placehold.co/300x200/F8F5EF/0F172A?text=${encodeURIComponent(menu.nama.substring(0, 12))}`;
                 return `
-                    <div onclick="tambahKeKeranjang(${menu.id})" class="menu-item border border-gold/20 rounded-lg p-2 text-center cursor-pointer transition bg-white" style="animation-delay: ${Math.min(index * 0.03, 0.5)}s">
-                        <img src="${imgSrc}" alt="${escapeHtml(menu.nama)}" class="w-full h-20 md:h-24 object-cover rounded mb-2 img-fade" loading="lazy" 
-                             onerror="this.onerror=null;this.src='${fallback}'" 
-                             onload="this.classList.add('loaded')">
-                        <p class="text-xs font-semibold text-navy leading-tight mb-1 font-modern">${escapeHtml(menu.nama)}</p>
-                        <p class="text-xs md:text-sm text-gold font-bold font-modern">${formatRp(menu.harga)}</p>
+                    <div onclick="tambahKeKeranjang(${menu.id})" class="border border-gold/20 rounded-lg p-2 text-center cursor-pointer bg-white active:scale-95 transition">
+                        <img src="${menu.gambar}" alt="${escapeHtml(menu.nama)}" class="w-full h-16 md:h-24 object-cover rounded mb-1" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'">
+                        <p class="text-xs font-semibold text-navy leading-tight mb-0.5 line-clamp-2">${escapeHtml(menu.nama)}</p>
+                        <p class="text-xs text-gold font-bold">${formatRp(menu.harga)}</p>
                     </div>
                 `;
             }).join('');
-            
-            DOM.posMenu.innerHTML = html;
         }
         
         function tambahKeKeranjang(id) {
@@ -1023,45 +862,40 @@
         }
         
         function renderKeranjang() {
+            const container = $('cart-container');
             if (!keranjang.length) {
-                DOM.cartContainer.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm font-modern">Keranjang masih kosong</div>';
-                DOM.cartSubtotal.innerText = 'Rp 0';
-                DOM.cartTotal.innerText = 'Rp 0';
+                container.innerHTML = '<div class="text-center text-slate-400 mt-6 text-xs">Keranjang kosong</div>';
+                $('cart-subtotal').innerText = 'Rp 0';
+                $('cart-total').innerText = 'Rp 0';
                 return;
             }
             
             let subtotal = 0;
-            const html = keranjang.map(item => {
+            container.innerHTML = keranjang.map(item => {
                 const totalItem = item.harga * item.qty;
                 subtotal += totalItem;
                 return `
-                    <div class="cart-item flex justify-between items-center text-sm border-b border-gold/10 pb-2">
+                    <div class="flex justify-between items-center text-xs border-b border-gold/10 pb-2">
                         <div class="flex-1 min-w-0">
                             <p class="font-semibold text-navy truncate">${escapeHtml(item.nama)}</p>
                             <p class="text-slate-500 text-xs">${formatRp(item.harga)}</p>
                         </div>
-                        <div class="flex items-center space-x-1 md:space-x-2 mx-1 md:mx-2 shrink-0">
-                            <button onclick="ubahQty(${item.id}, -1)" class="w-6 h-6 bg-cream rounded flex items-center justify-center hover:bg-gold hover:text-white font-bold text-navy border border-gold/30">−</button>
-                            <span class="font-semibold w-4 text-center text-navy">${item.qty}</span>
-                            <button onclick="ubahQty(${item.id}, 1)" class="w-6 h-6 bg-cream rounded flex items-center justify-center hover:bg-gold hover:text-white font-bold text-navy border border-gold/30">+</button>
+                        <div class="flex items-center gap-1 mx-1 shrink-0">
+                            <button onclick="ubahQty(${item.id}, -1)" class="w-6 h-6 bg-cream rounded flex items-center justify-center font-bold text-navy border border-gold/30">−</button>
+                            <span class="font-semibold w-5 text-center">${item.qty}</span>
+                            <button onclick="ubahQty(${item.id}, 1)" class="w-6 h-6 bg-cream rounded flex items-center justify-center font-bold text-navy border border-gold/30">+</button>
                         </div>
-                        <p class="font-semibold text-navy w-16 md:w-20 text-right shrink-0">${formatRp(totalItem)}</p>
+                        <p class="font-semibold text-navy w-16 text-right shrink-0">${formatRp(totalItem)}</p>
                     </div>
                 `;
             }).join('');
             
-            DOM.cartContainer.innerHTML = html;
-            DOM.cartSubtotal.innerText = formatRp(subtotal);
-            DOM.cartTotal.innerText = formatRp(subtotal);
+            $('cart-subtotal').innerText = formatRp(subtotal);
+            $('cart-total').innerText = formatRp(subtotal);
         }
         
         function prosesPembayaran() {
             if (!keranjang.length) return alert("Keranjang masih kosong!");
-            
-            if (DOM.btnBayar) {
-                DOM.btnBayar.classList.add('shake-animation');
-                setTimeout(() => DOM.btnBayar.classList.remove('shake-animation'), 500);
-            }
             
             const subtotal = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
             const transaksiBaru = { 
@@ -1087,7 +921,7 @@
                 keranjang = [];
                 renderKeranjang();
                 renderDashboard();
-            }, 400);
+            }, 300);
         }
 
         function tampilkanStruk(transaksi) {
@@ -1096,7 +930,7 @@
             $('struk-metode').innerText = transaksi.metode;
             $('struk-barcode-text').innerText = transaksi.id.replace('TRX-', '');
             
-            DOM.strukItems.innerHTML = transaksi.items.map(item => `
+            $('struk-items').innerHTML = transaksi.items.map(item => `
                 <div class="struk-item">
                     <span class="struk-item-name">${escapeHtml(item.nama)}</span>
                     <div class="struk-item-detail">
@@ -1114,16 +948,16 @@
         function cetakStruk() { window.print(); }
 
         function renderMenuTable() {
-            DOM.menuTable.innerHTML = menuData.map(menu => `
-                <tr class="border-b border-gold/10 hover:bg-cream transition">
-                    <td class="px-3 py-3">${menu.id}</td>
-                    <td class="px-3 py-3 font-medium">${escapeHtml(menu.nama)}</td>
-                    <td class="px-3 py-3">${menu.kategori}</td>
-                    <td class="px-3 py-3">${formatRp(menu.harga)}</td>
-                    <td class="px-3 py-3"><span class="px-2 py-1 rounded-full text-xs ${menu.status === 'Tersedia' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${menu.status}</span></td>
-                    <td class="px-3 py-3 text-center whitespace-nowrap">
-                        <button onclick="toggleStatusMenu(${menu.id})" class="text-blue-600 hover:underline text-xs mr-2">Status</button>
-                        <button onclick="hapusMenu(${menu.id})" class="text-red-600 hover:underline text-xs">Hapus</button>
+            $('menu-table-body').innerHTML = menuData.map(menu => `
+                <tr class="border-b border-gold/10">
+                    <td class="px-2 py-2">${menu.id}</td>
+                    <td class="px-2 py-2 font-medium">${escapeHtml(menu.nama)}</td>
+                    <td class="px-2 py-2">${menu.kategori}</td>
+                    <td class="px-2 py-2">${formatRp(menu.harga)}</td>
+                    <td class="px-2 py-2"><span class="px-1.5 py-0.5 rounded-full text-xs ${menu.status === 'Tersedia' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${menu.status}</span></td>
+                    <td class="px-2 py-2 text-center whitespace-nowrap">
+                        <button onclick="toggleStatusMenu(${menu.id})" class="text-blue-600 text-xs mr-1">Status</button>
+                        <button onclick="hapusMenu(${menu.id})" class="text-red-600 text-xs">Hapus</button>
                     </td>
                 </tr>
             `).join('');
@@ -1167,17 +1001,17 @@
         }
 
         function renderStokTable() {
-            DOM.stokTable.innerHTML = stokData.map(stok => {
+            $('stok-table-body').innerHTML = stokData.map(stok => {
                 const isLow = stok.stok < 5;
                 return `
-                    <tr class="border-b border-gold/10 hover:bg-cream transition">
-                        <td class="px-3 py-3">${stok.id}</td>
-                        <td class="px-3 py-3 font-medium">${escapeHtml(stok.nama)}</td>
-                        <td class="px-3 py-3 ${isLow ? 'text-red-500 font-bold' : ''}">${stok.stok}</td>
-                        <td class="px-3 py-3">${stok.satuan}</td>
-                        <td class="px-3 py-3 text-center whitespace-nowrap">
-                            <button onclick="tambahStok(${stok.id})" class="text-green-600 hover:underline text-xs mr-2">+ Stok</button>
-                            <button onclick="hapusStok(${stok.id})" class="text-red-600 hover:underline text-xs">Hapus</button>
+                    <tr class="border-b border-gold/10">
+                        <td class="px-2 py-2">${stok.id}</td>
+                        <td class="px-2 py-2 font-medium">${escapeHtml(stok.nama)}</td>
+                        <td class="px-2 py-2 ${isLow ? 'text-red-500 font-bold' : ''}">${stok.stok}</td>
+                        <td class="px-2 py-2">${stok.satuan}</td>
+                        <td class="px-2 py-2 text-center whitespace-nowrap">
+                            <button onclick="tambahStok(${stok.id})" class="text-green-600 text-xs mr-1">+ Stok</button>
+                            <button onclick="hapusStok(${stok.id})" class="text-red-600 text-xs">Hapus</button>
                         </td>
                     </tr>
                 `;
@@ -1218,19 +1052,20 @@
         }
 
         function renderLaporan() {
+            const tbody = $('laporan-table-body');
             if (!transaksiData.length) { 
-                DOM.laporanTable.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-400 font-modern">Belum ada transaksi</td></tr>'; 
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-400 text-xs">Belum ada transaksi</td></tr>'; 
                 return; 
             }
-            DOM.laporanTable.innerHTML = [...transaksiData].reverse().map(trx => {
+            tbody.innerHTML = [...transaksiData].reverse().map(trx => {
                 const itemsStr = trx.items.map(i => `${i.nama} (${i.qty}x)`).join(', ');
                 return `
-                    <tr class="border-b border-gold/10 hover:bg-cream transition">
-                        <td class="px-3 py-3 text-xs font-mono">${trx.id}</td>
-                        <td class="px-3 py-3 text-xs">${new Date(trx.tanggal).toLocaleString('id-ID')}</td>
-                        <td class="px-3 py-3 font-semibold text-gold">${formatRp(trx.total)}</td>
-                        <td class="px-3 py-3"><span class="px-2 py-1 rounded-full text-xs bg-navy text-gold">${trx.metode}</span></td>
-                        <td class="px-3 py-3 text-xs text-slate-500 max-w-xs truncate" title="${escapeHtml(itemsStr)}">${escapeHtml(itemsStr)}</td>
+                    <tr class="border-b border-gold/10">
+                        <td class="px-2 py-2 text-xs font-mono">${trx.id.substring(0, 12)}...</td>
+                        <td class="px-2 py-2 text-xs">${new Date(trx.tanggal).toLocaleString('id-ID')}</td>
+                        <td class="px-2 py-2 font-semibold text-gold">${formatRp(trx.total)}</td>
+                        <td class="px-2 py-2"><span class="px-1.5 py-0.5 rounded-full text-xs bg-navy text-gold">${trx.metode}</span></td>
+                        <td class="px-2 py-2 text-xs text-slate-500 truncate max-w-xs">${escapeHtml(itemsStr)}</td>
                     </tr>
                 `;
             }).join('');
@@ -1240,7 +1075,7 @@
         function closeModal(id) { const el = $(id); if (el) el.classList.remove('active'); }
 
         function resetAllData() {
-            if (confirm("⚠️ PERINGATAN! Ini akan menghapus SEMUA data. Lanjutkan?")) {
+            if (confirm("⚠️ Hapus SEMUA data?")) {
                 localStorage.clear();
                 location.reload();
             }
@@ -1248,7 +1083,7 @@
         window.resetAllData = resetAllData;
         
         function forceRefreshData() {
-            if (confirm("🔄 Refresh data menu & stok ke versi terbaru?\n(Data transaksi tetap aman)")) {
+            if (confirm("🔄 Refresh menu & stok?")) {
                 localStorage.removeItem(STORAGE_KEYS.MENU);
                 localStorage.removeItem(STORAGE_KEYS.STOK);
                 menuData = [...DEFAULT_MENU];
@@ -1269,8 +1104,6 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            cacheDOM();
-            
             const wasReset = checkVersion();
             if (wasReset) {
                 menuData = [...DEFAULT_MENU];
@@ -1283,10 +1116,7 @@
             setInterval(updateClock, 60000);
             showPage('dashboard');
             
-            console.log('%c✅ Aplikasi siap!', 'color: #C9A227; font-weight: bold;', 'APP_VERSION:', APP_VERSION);
-            console.log('%c💡 Tips:', 'color: #0F172A; font-weight: bold;');
-            console.log('   resetAllData() — Hapus semua data');
-            console.log('   forceRefreshData() — Refresh menu & stok');
+            console.log('✅ Aplikasi siap! Versi:', APP_VERSION);
         });
     </script>
 </body>
