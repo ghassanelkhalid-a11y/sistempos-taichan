@@ -29,7 +29,6 @@
         }
 
         .bg-navy { background-color: var(--navy); }
-        .bg-navy-light { background-color: var(--navy-light); }
         .bg-gold { background-color: var(--gold); }
         .bg-cream { background-color: var(--cream); }
         .text-gold { color: var(--gold); }
@@ -42,7 +41,7 @@
             background: linear-gradient(135deg, #F8F5EF 0%, #EDE8DD 100%);
         }
 
-        /* ==================== SIDEBAR - FIXED MOBILE ==================== */
+        /* ==================== SIDEBAR ==================== */
         #sidebar {
             background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
             border-right: 1px solid rgba(201, 162, 39, 0.3);
@@ -53,15 +52,12 @@
             flex-shrink: 0;
         }
 
-        /* Desktop: sidebar normal */
         @media (min-width: 1024px) {
             #sidebar {
                 position: relative;
                 transform: none !important;
             }
-            #sidebar.collapsed {
-                width: 72px;
-            }
+            #sidebar.collapsed { width: 72px; }
             #sidebar.collapsed .sidebar-text,
             #sidebar.collapsed .sidebar-logo-text,
             #sidebar.collapsed .sidebar-quote,
@@ -81,7 +77,6 @@
             }
         }
 
-        /* Mobile: sidebar tersembunyi dari kiri, default TERTUTUP */
         @media (max-width: 1023px) {
             #sidebar {
                 position: fixed;
@@ -91,9 +86,7 @@
                 transform: translateX(-100%);
                 z-index: 100;
             }
-            #sidebar.mobile-open {
-                transform: translateX(0);
-            }
+            #sidebar.mobile-open { transform: translateX(0); }
         }
 
         .sidebar-text,
@@ -105,7 +98,6 @@
             overflow: hidden;
         }
 
-        /* ==================== OVERLAY MOBILE ==================== */
         #sidebar-overlay {
             display: none;
             position: fixed;
@@ -113,11 +105,8 @@
             background: rgba(15, 23, 42, 0.6);
             z-index: 50;
         }
-        #sidebar-overlay.active {
-            display: block;
-        }
+        #sidebar-overlay.active { display: block; }
 
-        /* ==================== TOGGLE BUTTON ==================== */
         #btn-toggle-sidebar {
             display: flex;
             align-items: center;
@@ -131,10 +120,6 @@
             border: 1px solid rgba(201, 162, 39, 0.3);
             font-size: 1.1rem;
             flex-shrink: 0;
-            transition: all 0.2s;
-        }
-        #btn-toggle-sidebar:hover {
-            background: rgba(201, 162, 39, 0.3);
         }
 
         /* ==================== CARD ==================== */
@@ -233,7 +218,7 @@
         .btn-cetak { background: var(--navy); color: white; }
         .btn-tutup { background: var(--gold); color: white; }
 
-        /* ==================== RESPONSIVE MOBILE ==================== */
+        /* ==================== RESPONSIVE ==================== */
         @media (max-width: 640px) {
             .card-db { padding: 0.6rem !important; }
             header { padding: 0.5rem 0.75rem !important; }
@@ -258,36 +243,122 @@
             .struk-container { box-shadow: none; border: none; max-height: none; }
         }
 
-        /* Floating Action Button untuk toggle di mobile */
-        .fab-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--gold);
-            color: var(--navy);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            z-index: 90;
-            cursor: pointer;
-            border: none;
-        }
+        /* ==================== LAYOUT POS MOBILE - STICKY CART ==================== */
         @media (max-width: 1023px) {
-            .fab-toggle { display: flex; }
+            /* Sembunyikan FAB */
+            .fab-toggle { display: none !important; }
+            
+            /* Halaman POS: flex column full height */
+            #page-pos {
+                display: flex !important;
+                flex-direction: column;
+                height: calc(100vh - 70px) !important;
+                padding: 0 !important;
+                overflow: hidden;
+            }
+            
+            /* Daftar Menu: scroll sendiri */
+            #page-pos .pos-menu-wrapper {
+                flex: 1;
+                overflow-y: auto;
+                padding: 10px;
+                min-height: 0;
+            }
+            
+            /* Header daftar menu */
+            #page-pos .pos-header {
+                padding: 10px;
+                background: white;
+                border-bottom: 1px solid rgba(201, 162, 39, 0.3);
+                position: sticky;
+                top: 0;
+                z-index: 5;
+            }
+            
+            /* Keranjang: di bawah, collapse-able */
+            #page-pos .cart-wrapper {
+                background: white;
+                border-top: 2px solid var(--gold);
+                box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.1);
+                max-height: 45vh;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            #page-pos .cart-wrapper.collapsed {
+                max-height: 90px;
+            }
+            
+            #page-pos .cart-header {
+                padding: 10px 12px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+                user-select: none;
+                background: white;
+            }
+            
+            #page-pos .cart-body {
+                padding: 0 12px 12px 12px;
+                overflow-y: auto;
+                flex: 1;
+                min-height: 0;
+            }
+            
+            #page-pos .cart-wrapper.collapsed .cart-body {
+                display: none;
+            }
+            
+            /* Tombol Bayar: besar dan mencolok */
+            #btn-bayar {
+                width: 100%;
+                padding: 14px;
+                font-size: 16px;
+                border-radius: 10px;
+                margin-top: 8px;
+                margin-bottom: 8px;
+                box-shadow: 0 4px 12px rgba(201, 162, 39, 0.4);
+            }
+            
+            /* Padding tambahan di bawah tombol Bayar */
+            #page-pos .cart-body {
+                padding-bottom: 16px;
+            }
+        }
+
+        /* ==================== FIX BAWAH LAYAR ==================== */
+        @media (max-width: 1023px) {
+            #page-pos {
+                padding-bottom: env(safe-area-inset-bottom, 8px) !important;
+            }
+        }
+
+        /* ==================== CART COLLAPSE INDICATOR ==================== */
+        .cart-collapse-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+            color: var(--gold);
+        }
+        .cart-wrapper.collapsed .cart-collapse-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Badge jumlah item di header keranjang */
+        .cart-badge {
+            background: var(--gold);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
         }
     </style>
 </head>
 <body class="font-modern antialiased flex h-screen overflow-hidden">
 
-    <!-- OVERLAY -->
     <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-    <!-- SIDEBAR -->
     <aside id="sidebar" class="text-white flex flex-col">
         <div class="p-5 flex flex-col items-center border-b border-gold/30">
             <div class="logo-wrapper w-20 h-20 rounded-full bg-gradient-to-br from-[#C9A227] to-[#8B7418] border-2 border-gold flex items-center justify-center overflow-hidden shadow-lg transition-all duration-300">
@@ -325,7 +396,6 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col overflow-y-auto main-background" style="min-width: 0;">
         <header class="bg-white/90 backdrop-blur-md px-3 md:px-6 py-3 flex justify-between items-center shadow-sm sticky top-0 z-10 border-b border-gold/20">
             <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -397,12 +467,49 @@
             </div>
         </div>
 
-        <!-- POS -->
-        <div id="page-pos" class="page-content p-3 md:p-6 hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6">
-                <div class="lg:col-span-2 card-db p-3 md:p-5">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-3 border-b border-gold/30 pb-3">
-                        <h3 class="font-elegant text-sm md:text-lg text-navy">Daftar Menu</h3>
+        <!-- ==================== POS - LAYOUT BARU ==================== -->
+        <div id="page-pos" class="page-content hidden">
+            <!-- Desktop: layout grid biasa -->
+            <div class="hidden lg:grid lg:grid-cols-3 gap-6 p-6 h-[calc(100vh-100px)]">
+                <div class="lg:col-span-2 card-db p-5 flex flex-col overflow-hidden">
+                    <div class="flex justify-between items-center mb-4 border-b border-gold/30 pb-3">
+                        <h3 class="font-elegant text-lg text-navy">Daftar Menu</h3>
+                        <div class="flex flex-wrap gap-2 text-sm">
+                            <button onclick="filterMenu('Semua', event)" class="filter-btn bg-navy text-white px-4 py-1.5 rounded-full text-xs">Semua</button>
+                            <button onclick="filterMenu('Sate', event)" class="filter-btn bg-gray-100 text-navy px-4 py-1.5 rounded-full text-xs">Sate</button>
+                            <button onclick="filterMenu('Tambahan', event)" class="filter-btn bg-gray-100 text-navy px-4 py-1.5 rounded-full text-xs">Tambahan</button>
+                            <button onclick="filterMenu('Minuman', event)" class="filter-btn bg-gray-100 text-navy px-4 py-1.5 rounded-full text-xs">Minuman</button>
+                        </div>
+                    </div>
+                    <div id="pos-menu-container-desktop" class="grid grid-cols-4 gap-3 overflow-y-auto hide-scrollbar pb-4"></div>
+                </div>
+
+                <div class="card-db p-5 flex flex-col">
+                    <div class="flex justify-between items-center mb-4 border-b border-gold/30 pb-3">
+                        <h3 class="font-elegant text-lg text-navy">Keranjang</h3>
+                        <button onclick="clearCart()" class="text-red-500 text-xs hover:underline">Hapus</button>
+                    </div>
+                    <div id="cart-container-desktop" class="flex-1 space-y-3 overflow-y-auto hide-scrollbar mb-4"></div>
+                    <div class="border-t border-gold/30 pt-4 space-y-2 text-sm">
+                        <div class="flex justify-between"><span>Subtotal</span><span id="cart-subtotal-desktop">Rp 0</span></div>
+                        <div class="flex justify-between font-bold text-xl text-navy border-t border-dashed border-gold/30 pt-2"><span>Total</span><span id="cart-total-desktop">Rp 0</span></div>
+                        <div class="grid grid-cols-2 gap-2 mt-4">
+                            <button onclick="setPaymentMethod('Tunai')" id="btn-Tunai-desktop" class="payment-btn bg-navy text-white py-2 rounded-lg font-semibold text-xs">Tunai</button>
+                            <button onclick="setPaymentMethod('QRIS')" id="btn-QRIS-desktop" class="payment-btn bg-gray-100 text-navy py-2 rounded-lg font-semibold text-xs">QRIS</button>
+                        </div>
+                        <button onclick="prosesPembayaran()" class="w-full bg-gold text-white py-3 rounded-lg font-bold font-elegant text-lg mt-2 shadow-md btn-bayar">BAYAR</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile: layout baru (menu di atas, cart di bawah) -->
+            <div class="lg:hidden flex flex-col h-[calc(100vh-70px)]">
+                <!-- DAFTAR MENU (scroll) -->
+                <div class="pos-menu-wrapper flex-1 overflow-y-auto">
+                    <div class="pos-header">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-elegant text-base text-navy">Daftar Menu</h3>
+                        </div>
                         <div class="flex flex-wrap gap-1">
                             <button onclick="filterMenu('Semua', event)" class="filter-btn bg-navy text-white px-3 py-1 rounded-full text-xs">Semua</button>
                             <button onclick="filterMenu('Sate', event)" class="filter-btn bg-gray-100 text-navy px-3 py-1 rounded-full text-xs">Sate</button>
@@ -410,23 +517,35 @@
                             <button onclick="filterMenu('Minuman', event)" class="filter-btn bg-gray-100 text-navy px-3 py-1 rounded-full text-xs">Minuman</button>
                         </div>
                     </div>
-                    <div id="pos-menu-container" class="menu-grid grid grid-cols-2 gap-2 md:gap-3"></div>
+                    <div id="pos-menu-container" class="menu-grid grid grid-cols-2 gap-2 p-2"></div>
                 </div>
 
-                <div class="card-db p-3 md:p-5">
-                    <div class="flex justify-between items-center mb-3 border-b border-gold/30 pb-2">
-                        <h3 class="font-elegant text-sm md:text-lg text-navy">Keranjang</h3>
-                        <button onclick="clearCart()" class="text-red-500 text-xs hover:underline">Hapus</button>
-                    </div>
-                    <div id="cart-container" class="space-y-2 mb-3 max-h-[250px] overflow-y-auto hide-scrollbar"></div>
-                    <div class="border-t border-gold/30 pt-3 space-y-2">
-                        <div class="flex justify-between text-xs"><span>Subtotal</span><span id="cart-subtotal">Rp 0</span></div>
-                        <div class="flex justify-between font-bold text-base md:text-xl text-navy border-t border-dashed border-gold/30 pt-2"><span>Total</span><span id="cart-total">Rp 0</span></div>
-                        <div class="grid grid-cols-2 gap-2 mt-3">
-                            <button onclick="setPaymentMethod('Tunai')" id="btn-Tunai" class="payment-btn bg-navy text-white py-2 rounded-lg font-semibold text-xs">Tunai</button>
-                            <button onclick="setPaymentMethod('QRIS')" id="btn-QRIS" class="payment-btn bg-gray-100 text-navy py-2 rounded-lg font-semibold text-xs">QRIS</button>
+                <!-- KERANJANG (collapse-able, sticky di bawah) -->
+                <div id="cart-wrapper" class="cart-wrapper">
+                    <div class="cart-header" onclick="toggleCart()">
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-elegant text-base text-navy">Keranjang</h3>
+                            <span class="cart-badge" id="cart-badge">0</span>
                         </div>
-                        <button onclick="prosesPembayaran()" id="btn-bayar" class="w-full bg-gold text-white py-3 rounded-lg font-bold font-elegant text-base mt-2 shadow-md btn-bayar">BAYAR</button>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-500" id="cart-total-mini">Rp 0</span>
+                            <span class="cart-collapse-icon" id="cart-icon">▲</span>
+                        </div>
+                    </div>
+                    <div class="cart-body">
+                        <div class="flex justify-end mb-2">
+                            <button onclick="event.stopPropagation(); clearCart()" class="text-red-500 text-xs hover:underline">Hapus Semua</button>
+                        </div>
+                        <div id="cart-container" class="space-y-2 max-h-[150px] overflow-y-auto hide-scrollbar mb-2"></div>
+                        <div class="border-t border-gold/30 pt-2 space-y-1.5 text-sm">
+                            <div class="flex justify-between"><span>Subtotal</span><span id="cart-subtotal">Rp 0</span></div>
+                            <div class="flex justify-between font-bold text-lg text-navy border-t border-dashed border-gold/30 pt-1.5"><span>Total</span><span id="cart-total">Rp 0</span></div>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <button onclick="setPaymentMethod('Tunai')" id="btn-Tunai" class="payment-btn bg-navy text-white py-2 rounded-lg font-semibold text-xs">Tunai</button>
+                                <button onclick="setPaymentMethod('QRIS')" id="btn-QRIS" class="payment-btn bg-gray-100 text-navy py-2 rounded-lg font-semibold text-xs">QRIS</button>
+                            </div>
+                            <button onclick="prosesPembayaran()" id="btn-bayar" class="w-full bg-gold text-white py-3 rounded-lg font-bold font-elegant text-base shadow-md btn-bayar">BAYAR</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -483,9 +602,6 @@
             </div>
         </div>
     </main>
-
-    <!-- FAB Toggle untuk mobile -->
-    <button class="fab-toggle" onclick="toggleSidebar()" title="Menu">☰</button>
 
     <!-- MODAL MENU -->
     <div id="modal-menu" class="modal">
@@ -563,7 +679,7 @@
         'use strict';
 
         const STORAGE_KEYS = Object.freeze({ MENU: 'menuData', STOK: 'stokData', TRANSAKSI: 'transaksiData', VERSION: 'appVersion' });
-        const APP_VERSION = '7.0';
+        const APP_VERSION = '8.0';
 
         const $ = (id) => document.getElementById(id);
 
@@ -628,12 +744,29 @@
         let filterKategori = 'Semua';
         let salesChartInstance = null;
         let menuById = new Map();
+        let cartCollapsed = false;
 
         const buildMenuIndex = () => { menuById.clear(); menuData.forEach(m => menuById.set(m.id, m)); };
         buildMenuIndex();
 
         const formatRp = (n) => `Rp ${n.toLocaleString('id-ID')}`;
         const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+        // ==================== CART TOGGLE ====================
+        function toggleCart() {
+            const wrapper = $('cart-wrapper');
+            const icon = $('cart-icon');
+            if (!wrapper) return;
+            
+            cartCollapsed = !cartCollapsed;
+            if (cartCollapsed) {
+                wrapper.classList.add('collapsed');
+                if (icon) icon.innerText = '▼';
+            } else {
+                wrapper.classList.remove('collapsed');
+                if (icon) icon.innerText = '▲';
+            }
+        }
 
         // ==================== TOGGLE SIDEBAR ====================
         function toggleSidebar() {
@@ -791,7 +924,10 @@
             }
         }
 
-        function renderPOS() { renderMenuPOS(); renderKeranjang(); }
+        function renderPOS() { 
+            renderMenuPOS(); 
+            renderKeranjang(); 
+        }
         
         function filterMenu(kategori, evt) {
             filterKategori = kategori;
@@ -811,17 +947,35 @@
                 ? menuData.filter(m => m.status !== 'Habis')
                 : menuData.filter(m => m.kategori === filterKategori && m.status !== 'Habis');
             
-            const container = $('pos-menu-container');
-            container.innerHTML = filtered.map(menu => {
-                const fallback = `https://placehold.co/300x200/F8F5EF/0F172A?text=${encodeURIComponent(menu.nama.substring(0, 12))}`;
-                return `
-                    <div onclick="tambahKeKeranjang(${menu.id})" class="border border-gold/20 rounded-lg p-2 text-center cursor-pointer bg-white active:scale-95 transition">
-                        <img src="${menu.gambar}" alt="${escapeHtml(menu.nama)}" class="w-full h-16 md:h-24 object-cover rounded mb-1" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'">
-                        <p class="text-xs font-semibold text-navy leading-tight mb-0.5 line-clamp-2">${escapeHtml(menu.nama)}</p>
-                        <p class="text-xs text-gold font-bold">${formatRp(menu.harga)}</p>
-                    </div>
-                `;
-            }).join('');
+            // Render ke desktop container
+            const containerDesktop = $('pos-menu-container-desktop');
+            if (containerDesktop) {
+                containerDesktop.innerHTML = filtered.map(menu => {
+                    const fallback = `https://placehold.co/300x200/F8F5EF/0F172A?text=${encodeURIComponent(menu.nama.substring(0, 12))}`;
+                    return `
+                        <div onclick="tambahKeKeranjang(${menu.id})" class="border border-gold/20 rounded-lg p-2 text-center cursor-pointer bg-white hover:shadow-md transition">
+                            <img src="${menu.gambar}" alt="${escapeHtml(menu.nama)}" class="w-full h-24 object-cover rounded mb-1" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'">
+                            <p class="text-xs font-semibold text-navy leading-tight mb-0.5">${escapeHtml(menu.nama)}</p>
+                            <p class="text-xs text-gold font-bold">${formatRp(menu.harga)}</p>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Render ke mobile container
+            const containerMobile = $('pos-menu-container');
+            if (containerMobile) {
+                containerMobile.innerHTML = filtered.map(menu => {
+                    const fallback = `https://placehold.co/300x200/F8F5EF/0F172A?text=${encodeURIComponent(menu.nama.substring(0, 12))}`;
+                    return `
+                        <div onclick="tambahKeKeranjang(${menu.id})" class="border border-gold/20 rounded-lg p-2 text-center cursor-pointer bg-white active:scale-95 transition">
+                            <img src="${menu.gambar}" alt="${escapeHtml(menu.nama)}" class="w-full h-20 object-cover rounded mb-1" loading="lazy" onerror="this.onerror=null;this.src='${fallback}'">
+                            <p class="text-xs font-semibold text-navy leading-tight mb-0.5 line-clamp-2">${escapeHtml(menu.nama)}</p>
+                            <p class="text-xs text-gold font-bold">${formatRp(menu.harga)}</p>
+                        </div>
+                    `;
+                }).join('');
+            }
         }
         
         function tambahKeKeranjang(id) {
@@ -831,6 +985,10 @@
             if (item) item.qty++;
             else keranjang.push({ ...menu, qty: 1 });
             renderKeranjang();
+            // Auto expand cart saat item ditambahkan
+            if (cartCollapsed && window.innerWidth < 1024) {
+                toggleCart();
+            }
         }
         
         function ubahQty(id, perubahan) {
@@ -854,26 +1012,26 @@
                 btn.classList.remove('bg-navy', 'text-white');
                 btn.classList.add('bg-gray-100', 'text-navy');
             });
-            const btn = $(`btn-${method}`);
-            if (btn) {
-                btn.classList.remove('bg-gray-100', 'text-navy');
-                btn.classList.add('bg-navy', 'text-white');
-            }
+            // Update semua tombol dengan id
+            ['btn-Tunai', 'btn-Tunai-desktop'].forEach(id => {
+                const btn = $(id);
+                if (btn && method === 'Tunai') {
+                    btn.classList.remove('bg-gray-100', 'text-navy');
+                    btn.classList.add('bg-navy', 'text-white');
+                }
+            });
+            ['btn-QRIS', 'btn-QRIS-desktop'].forEach(id => {
+                const btn = $(id);
+                if (btn && method === 'QRIS') {
+                    btn.classList.remove('bg-gray-100', 'text-navy');
+                    btn.classList.add('bg-navy', 'text-white');
+                }
+            });
         }
         
         function renderKeranjang() {
-            const container = $('cart-container');
-            if (!keranjang.length) {
-                container.innerHTML = '<div class="text-center text-slate-400 mt-6 text-xs">Keranjang kosong</div>';
-                $('cart-subtotal').innerText = 'Rp 0';
-                $('cart-total').innerText = 'Rp 0';
-                return;
-            }
-            
-            let subtotal = 0;
-            container.innerHTML = keranjang.map(item => {
+            const html = keranjang.length ? keranjang.map(item => {
                 const totalItem = item.harga * item.qty;
-                subtotal += totalItem;
                 return `
                     <div class="flex justify-between items-center text-xs border-b border-gold/10 pb-2">
                         <div class="flex-1 min-w-0">
@@ -888,10 +1046,34 @@
                         <p class="font-semibold text-navy w-16 text-right shrink-0">${formatRp(totalItem)}</p>
                     </div>
                 `;
-            }).join('');
+            }).join('') : '<div class="text-center text-slate-400 mt-4 text-xs">Keranjang kosong</div>';
             
-            $('cart-subtotal').innerText = formatRp(subtotal);
-            $('cart-total').innerText = formatRp(subtotal);
+            const subtotal = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+            const totalQty = keranjang.reduce((sum, item) => sum + item.qty, 0);
+            
+            // Update semua container
+            ['cart-container', 'cart-container-desktop'].forEach(id => {
+                const el = $(id);
+                if (el) el.innerHTML = html;
+            });
+            
+            ['cart-subtotal', 'cart-subtotal-desktop'].forEach(id => {
+                const el = $(id);
+                if (el) el.innerText = formatRp(subtotal);
+            });
+            
+            ['cart-total', 'cart-total-desktop'].forEach(id => {
+                const el = $(id);
+                if (el) el.innerText = formatRp(subtotal);
+            });
+            
+            // Update mini total di header cart mobile
+            const cartTotalMini = $('cart-total-mini');
+            if (cartTotalMini) cartTotalMini.innerText = formatRp(subtotal);
+            
+            // Update badge
+            const badge = $('cart-badge');
+            if (badge) badge.innerText = totalQty;
         }
         
         function prosesPembayaran() {
@@ -1100,7 +1282,7 @@
             prosesPembayaran, cetakStruk, openModal, closeModal,
             simpanMenu, toggleStatusMenu, hapusMenu,
             simpanStok, tambahStok, hapusStok,
-            toggleSidebar
+            toggleSidebar, toggleCart
         });
 
         document.addEventListener('DOMContentLoaded', () => {
